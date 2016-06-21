@@ -17,7 +17,7 @@
       chdir: "{{ bench_path }}"
 
   - name: install frappe app
-    command: bench get-app frappe https://github.com/frappe/frappe
+    command: bench get-app frappe https://gitlab.com/modernmachines/erpnext-mirror
     args:
       creates: "{{ bench_path }}/apps/frappe"
       chdir: "{{ bench_path }}"
@@ -43,4 +43,3 @@
     args:
       creates: "{{ bench_path }}/config/redis_socketio.conf"
       chdir: "{{ bench_path }}"
-
