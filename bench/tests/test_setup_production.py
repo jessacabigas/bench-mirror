@@ -161,6 +161,3 @@ class TestSetupProduction(test_init.TestBenchInit):
 
 		for key in tests:
 			self.assertTrue(re.search(key.format(bench_name=bench_name), out))
-
-
-

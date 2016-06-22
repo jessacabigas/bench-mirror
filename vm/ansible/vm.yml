@@ -34,7 +34,7 @@
         frappe_branch: develop
         apps:
           - name: erpnext
-            url: https://github.com/frappe/erpnext
+            url: https://github.com/flomente96/erpnext
           - name: erpnext_demo
             url: https://github.com/frappe/erpnext_demo
         mariadb_root_password: "{{ mysql_root_password }}"

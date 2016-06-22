@@ -1,4 +1,4 @@
-# wget setup_frappe.py | python
+	# wget setup_frappe.py | python
 import os, sys, subprocess, getpass, json, multiprocessing, shutil
 from distutils.spawn import find_executable
 
