@@ -5,7 +5,7 @@
   user: "{{ frappe_user }}"
   tasks:
       - git:
-          repo=https://gitlab.com/modernmachines/erpnext-mirror
+          repo=https://github.com/flomente96/bench
           dest=/home/frappe/bench-repo
   tags:
     - bench_install
