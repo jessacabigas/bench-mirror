@@ -272,13 +272,13 @@ install_supervisor_centos6() {
 
 ### config
 
-get_mariadb_password() {
-	get_password "MariaDB root" MSQ_PASS
-}
+# get_mariadb_password() {
+# 	get_password "MariaDB root" MSQ_PASS
+# }
 
-get_site_admin_password() {
-	get_password "Admin password" ADMIN_PASS
-}
+# get_site_admin_password() {
+# 	get_password "Admin password" ADMIN_PASS
+# }
 
 get_password() {
 	if [ -z "$2" ]; then
@@ -300,7 +300,7 @@ get_password() {
 configure_mariadb_centos() {
 	# Required only for CentOS, Ubuntu and Debian will show dpkg configure screen to set the password
 	if [ $OS == "centos" ]; then
-		mysqladmin -u root password $MSQ_PASS
+		# mysqladmin -u root password $MSQ_PASS
 	fi
 }
 
