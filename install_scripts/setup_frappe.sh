@@ -2,7 +2,6 @@
 
 set -e
 
-
 ## Utils
 
 print_msg() {
@@ -89,6 +88,9 @@ get_distro() {
 	export ARCH=$ARCH
 	export T_ARCH=$T_ARCH
 	export WK_ARCH=$WK_ARCH
+	if [ $OS_VER == "xenial" ]; then
+		OS_VER="wily"
+	fi
 	echo Installing for $OS $OS_VER $ARCH
 	echo "In case you encounter an error, you can post on https://discuss.frappe.io"
 	echo
@@ -272,13 +274,13 @@ install_supervisor_centos6() {
 
 ### config
 
-# get_mariadb_password() {
-# 	get_password "MariaDB root" MSQ_PASS
-# }
+get_mariadb_password() {
+	get_password "MariaDB root" MSQ_PASS
+}
 
-# get_site_admin_password() {
-# 	get_password "Admin password" ADMIN_PASS
-# }
+get_site_admin_password() {
+	get_password "Admin password" ADMIN_PASS
+}
 
 get_password() {
 	if [ -z "$2" ]; then
@@ -300,7 +302,7 @@ get_password() {
 configure_mariadb_centos() {
 	# Required only for CentOS, Ubuntu and Debian will show dpkg configure screen to set the password
 	if [ $OS == "centos" ]; then
-		# mysqladmin -u root password $MSQ_PASS
+		mysqladmin -u root password $MSQ_PASS
 	fi
 }
 
@@ -371,7 +373,7 @@ setup_debconf() {
 }
 
 install_bench() {
-	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/flomente96/bench --branch $BENCH_BRANCH bench-repo"
+	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/frappe/bench --branch $BENCH_BRANCH bench-repo"
 	if hash pip-2.7 &> /dev/null; then
 		PIP="pip-2.7"
 	elif hash pip2.7 &> /dev/null; then
@@ -391,8 +393,8 @@ install_bench() {
 
 setup_bench() {
 	echo Installing frappe-bench
-	FRAPPE_BRANCH="master"
-	ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/flomente96/bench/master/install_scripts/erpnext-apps.json"
+	FRAPPE_BRANCH="develop"
+	ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/frappe/bench/master/install_scripts/erpnext-apps.json"
 	if $SETUP_PROD; then
 		FRAPPE_BRANCH="master"
 		ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/frappe/bench/master/install_scripts/erpnext-apps-master.json"
