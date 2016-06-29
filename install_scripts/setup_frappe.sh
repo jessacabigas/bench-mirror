@@ -14,6 +14,12 @@ get_passwd() {
 	echo `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
 }
 
+exists()
+{
+  command -v "$1" >/dev/null 2>&1
+}
+
+
 set_opts () {
 	OPTS=`getopt -o v --long verbose,mysql-root-password:,frappe-user:,bench-branch:,setup-production,skip-install-bench,skip-setup-bench,help -n 'parse-options' -- "$@"`
 
@@ -29,17 +35,30 @@ set_opts () {
 	INSTALL_BENCH=true
 	SETUP_BENCH=true
 
-	if [ -f ~/frappe_passwords.sh ]; then
+	#if frappe_passwords.sh exists, get password there. Else, generate (get_passwd function)
+	if exists mysql; then
+		read -s -p "MySql already exists. Please enter password: " MSQ_PASS
+		FRAPPE_USER_PASS=`get_passwd`
+		ADMIN_PASS=`get_passwd`
+
+		#echo generated passwords to the file frappe_passwords.sh
+		echo "FRAPPE_USER_PASS=$FRAPPE_USER_PASS" > ~/frappe_passwords.sh
+		echo "ADMIN_PASS=$ADMIN_PASS" >> ~/frappe_passwords.sh
+
+	elif [ -f ~/frappe_passwords.sh ]; then
 		source ~/frappe_passwords.sh
+
 	else
 		FRAPPE_USER_PASS=`get_passwd`
 		MSQ_PASS=`get_passwd`
 		ADMIN_PASS=`get_passwd`
 
+		#echo generated passwords to the file frappe_passwords.sh
 		echo "FRAPPE_USER_PASS=$FRAPPE_USER_PASS" > ~/frappe_passwords.sh
 		echo "MSQ_PASS=$MSQ_PASS" >> ~/frappe_passwords.sh
 		echo "ADMIN_PASS=$ADMIN_PASS" >> ~/frappe_passwords.sh
 	fi
+	#here dapat naay lahi na condition: if mysql exist, msq_pass = configured_password
 
 	while true; do
 	case "$1" in
@@ -373,7 +392,7 @@ setup_debconf() {
 }
 
 install_bench() {
-	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/frappe/bench --branch $BENCH_BRANCH bench-repo"
+	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/flomente96/bench --branch $BENCH_BRANCH bench-repo"
 	if hash pip-2.7 &> /dev/null; then
 		PIP="pip-2.7"
 	elif hash pip2.7 &> /dev/null; then
@@ -394,10 +413,10 @@ install_bench() {
 setup_bench() {
 	echo Installing frappe-bench
 	FRAPPE_BRANCH="develop"
-	ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/frappe/bench/master/install_scripts/erpnext-apps.json"
+	ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/flomente96/bench/master/install_scripts/erpnext-apps.json"
 	if $SETUP_PROD; then
 		FRAPPE_BRANCH="master"
-		ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/frappe/bench/master/install_scripts/erpnext-apps-master.json"
+		ERPNEXT_APPS_JSON="https://raw.githubusercontent.com/flomente96/bench/master/install_scripts/erpnext-apps-master.json"
 	fi
 
 	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && bench init frappe-bench --frappe-branch $FRAPPE_BRANCH --apps_path $ERPNEXT_APPS_JSON"
@@ -437,6 +456,7 @@ add_user() {
 main() {
 	set_opts $@
 	get_distro
+	echo Installing MariaDB....
 	add_maria_db_repo
 	echo Installing packages for $OS\. This might take time...
 	install_packages
