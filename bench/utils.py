@@ -59,7 +59,7 @@ def init(path, apps_path=None, no_procfile=False, no_backups=False,
 	make_config(path)
 
 	if not frappe_path:
-		frappe_path = 'git@gitlab.com:modernmachines/erpnext-mirror.git'
+		frappe_path = 'https://github.com/frappe/frappe.git'
 	get_app('frappe', frappe_path, branch=frappe_branch, bench_path=path, build_asset_files=False, verbose=verbose)
 
 	if apps_path:
