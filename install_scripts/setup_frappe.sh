@@ -11,7 +11,8 @@ print_msg() {
 }
 
 get_passwd() {
-	echo `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+	#echo `cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+	echo password
 }
 
 exists()
@@ -38,13 +39,16 @@ set_opts () {
 	#if frappe_passwords.sh exists, get password there. Else, generate (get_passwd function)
 	if exists mysql; then
 		read -s -p "MySql already exists. Please enter password: " MSQ_PASS
+		until mysql -u root -p$MSQ_PASS  -e ";" ; do
+		       read -s -p "Can't connect, please retry: " MSQ_PASS
+		done
+
 		FRAPPE_USER_PASS=`get_passwd`
 		ADMIN_PASS=`get_passwd`
 
 		#echo generated passwords to the file frappe_passwords.sh
 		echo "FRAPPE_USER_PASS=$FRAPPE_USER_PASS" > ~/frappe_passwords.sh
 		echo "ADMIN_PASS=$ADMIN_PASS" >> ~/frappe_passwords.sh
-
 	elif [ -f ~/frappe_passwords.sh ]; then
 		source ~/frappe_passwords.sh
 
@@ -392,7 +396,7 @@ setup_debconf() {
 }
 
 install_bench() {
-	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/flomente96/bench --branch $BENCH_BRANCH bench-repo"
+	run_cmd sudo su $FRAPPE_USER -c "cd /home/$FRAPPE_USER && git clone https://github.com/flomente96/bench.git --branch $BENCH_BRANCH bench-repo"
 	if hash pip-2.7 &> /dev/null; then
 		PIP="pip-2.7"
 	elif hash pip2.7 &> /dev/null; then
